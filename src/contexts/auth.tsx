@@ -1,4 +1,5 @@
-import React, {createContext, useState} from 'react';
+import React, {createContext, useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-community/async-storage';
 import * as auth from '../services/auth';
 
 interface AuthContextData {
@@ -13,16 +14,34 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider: React.FC = ({children}) => {
   const [user, setUser] = useState<Object | null>(null);
 
+  useEffect(() => {
+    async function loadStorageData() {
+      const storageUser = await AsyncStorage.getItem('@RNAuth:user');
+      const storageToken = await AsyncStorage.getItem('@RNAuth:token');
+
+      if (storageUser && storageToken) {
+        setUser(JSON.parse(storageUser));
+      }
+    }
+
+    loadStorageData();
+  }, []);
+
   async function signIn() {
     const response = await auth.signIn();
 
     console.warn(response);
 
+    await AsyncStorage.setItem('@RNAuth:user', JSON.stringify(response.user));
+    await AsyncStorage.setItem('@RNAuth:token', response.token);
+
     setUser(response.user);
   }
 
   function signOut() {
-    setUser(null);
+    AsyncStorage.clear().then(() => {
+      setUser(null);
+    });
   }
 
   return (
