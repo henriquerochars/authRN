@@ -4,6 +4,7 @@ import * as auth from '../services/auth';
 
 interface AuthContextData {
   signed: boolean;
+  loading: boolean;
   user: object | null;
   signIn(): Promise<void>;
   signOut(): void;
@@ -13,14 +14,18 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({children}) => {
   const [user, setUser] = useState<Object | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function loadStorageData() {
       const storageUser = await AsyncStorage.getItem('@RNAuth:user');
       const storageToken = await AsyncStorage.getItem('@RNAuth:token');
 
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
       if (storageUser && storageToken) {
         setUser(JSON.parse(storageUser));
+        setLoading(false);
       }
     }
 
@@ -45,7 +50,8 @@ export const AuthProvider: React.FC = ({children}) => {
   }
 
   return (
-    <AuthContext.Provider value={{signed: !!user, user: user, signIn, signOut}}>
+    <AuthContext.Provider
+      value={{signed: !!user, user: user, signIn, signOut, loading}}>
       {children}
     </AuthContext.Provider>
   );
