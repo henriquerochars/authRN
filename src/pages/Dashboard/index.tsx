@@ -1,5 +1,7 @@
 import React from 'react';
-import {View, Button, StyleSheet, Text} from 'react-native';
+import {View, StyleSheet, Text} from 'react-native';
+
+import FlatButton from './../../components/FlatButton';
 
 import {useAuth} from './../../contexts/auth';
 
@@ -10,13 +12,13 @@ const styles = StyleSheet.create({
 const Dashboard: React.FC = () => {
   const {signOut, user} = useAuth();
 
-  function handleSignOut() {
-    signOut();
+  async function handleSignOut() {
+    await signOut();
   }
   return (
     <View style={styles.container}>
       <Text>{user?.name}</Text>
-      <Button title="Sign out" onPress={handleSignOut} />
+      <FlatButton text="Sign out" onPress={handleSignOut} />
     </View>
   );
 };

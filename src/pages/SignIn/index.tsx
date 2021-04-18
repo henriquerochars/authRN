@@ -1,5 +1,7 @@
 import React from 'react';
-import {View, Button, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
+
+import FlatButton from './../../components/FlatButton';
 
 import {useAuth} from './../../contexts/auth';
 
@@ -17,7 +19,7 @@ const SignIn: React.FC = () => {
   };
   return (
     <View style={styles.container}>
-      <Button title="Sign in" onPress={handleSignIn} />
+      <FlatButton text="Sign in" onPress={handleSignIn} />
     </View>
   );
 };

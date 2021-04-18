@@ -13,7 +13,7 @@ interface AuthContextData {
   loading: boolean;
   user: User | null;
   signIn(): Promise<void>;
-  signOut(): void;
+  signOut(): Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -27,19 +27,21 @@ export const AuthProvider: React.FC = ({children}) => {
       const storageUser = await AsyncStorage.getItem('@RNAuth:user');
       const storageToken = await AsyncStorage.getItem('@RNAuth:token');
 
+      // to simulate login
       await new Promise(resolve => setTimeout(resolve, 3000));
 
       if (storageUser && storageToken) {
         api.defaults.headers.Authorization = `Bearer ${storageToken}`;
         setUser(JSON.parse(storageUser));
-        setLoading(false);
       }
+      setLoading(false);
     }
 
     loadStorageData();
   }, []);
 
   async function signIn() {
+    setLoading(true);
     const response = await auth.signIn();
 
     console.warn(response);
@@ -50,12 +52,19 @@ export const AuthProvider: React.FC = ({children}) => {
     await AsyncStorage.setItem('@RNAuth:token', response.token);
 
     setUser(response.user);
+    setLoading(false);
   }
 
-  function signOut() {
+  async function signOut() {
+    setLoading(true);
+
+    // to simulate login
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
     AsyncStorage.clear().then(() => {
       setUser(null);
     });
+    setLoading(false);
   }
 
   return (
